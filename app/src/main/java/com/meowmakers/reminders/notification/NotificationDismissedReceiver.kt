@@ -9,12 +9,23 @@ import com.meowmakers.reminders.Logger
 class NotificationDismissedReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context?, intent: Intent) {
-        // Your code here to handle the notification dismissal
         val notificationId = intent.getIntExtra(AppNotification.notificationIdExtraKey, 0)
         Logger.d(
             this::class.java,
             "Notification with ID $notificationId was dismissed."
         )
-        // Tell the service that the notification has been swiped away and resurrect it.
+
+
+        val serviceIntent = Intent(context, NotificationService::class.java)
+        val binder = peekService(context, serviceIntent)
+
+        if (binder != null) {
+            Logger.d(
+                this::class.java,
+                "Service exists, resurrecting notification"
+            )
+            val myService = (binder as NotificationService.LocalBinder).getService()
+            myService.showNotification(AppNotification.ReminderNotification)
+        }
     }
 }

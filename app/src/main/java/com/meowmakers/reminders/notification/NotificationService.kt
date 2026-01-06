@@ -29,7 +29,7 @@ class NotificationService : Service() {
         return START_STICKY
     }
 
-    private fun showNotification(notification: AppNotification) {
+    fun showNotification(notification: AppNotification) {
         try {
             val intent =
                 Intent(applicationContext, NotificationDismissedReceiver::class.java).apply {
