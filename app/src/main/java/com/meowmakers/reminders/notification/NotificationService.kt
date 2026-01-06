@@ -2,6 +2,7 @@ package com.meowmakers.reminders.notification
 
 import android.R
 import android.app.ForegroundServiceStartNotAllowedException
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo
@@ -19,27 +20,42 @@ class NotificationService : Service() {
         Logger.d(NotificationService::class.java, "onCreate")
         super.onCreate()
         AppNotificationChannel.ReminderChannel.register(this)
-        showNotification()
+        showNotification(AppNotification.ReminderNotification)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Logger.d(NotificationService::class.java, "onStartCommand")
-        showNotification()
+        showNotification(AppNotification.ReminderNotification)
         return START_STICKY
     }
 
-    private fun showNotification() {
+    private fun showNotification(notification: AppNotification) {
         try {
-            val notification =
-                NotificationCompat.Builder(this, AppNotification.ReminderNotification.channelId)
-                    .setSmallIcon(R.drawable.ic_menu_mylocation)
-                    .setContentTitle("Meow Reminder Active")
-                    .setContentText("Scanning for nearby locations...")
-                    .setSubText("Location Service")
-                    .setPriority(NotificationCompat.PRIORITY_LOW)
-                    .setOngoing(true)
-                    .setOnlyAlertOnce(true)
-                    .build()
+            val intent =
+                Intent(applicationContext, NotificationDismissedReceiver::class.java).apply {
+                    putExtra(AppNotification.notificationIdExtraKey, notification.id)
+                }
+
+            val deletePendingIntent = PendingIntent.getBroadcast(
+                applicationContext,
+                notification.id,
+                intent,
+                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
+
+            val notification = NotificationCompat.Builder(
+                this,
+                notification.channel.id
+            )
+                .setSmallIcon(R.drawable.ic_menu_mylocation)
+                .setContentTitle("Meow Reminder Active")
+                .setContentText("Scanning for nearby locations...")
+                .setSubText("Location Service")
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setDeleteIntent(deletePendingIntent)
+                .build()
 
             val serviceType = when {
                 Build.VERSION.SDK_INT >= 29 -> ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION
@@ -65,7 +81,7 @@ class NotificationService : Service() {
 
     override fun onBind(intent: Intent?): IBinder {
         Logger.d(NotificationService::class.java, "onBind")
-        showNotification()
+        showNotification(AppNotification.ReminderNotification)
         return binder
     }
 
