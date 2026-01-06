@@ -16,7 +16,7 @@ sealed class AppNotificationChannel(
         "reminder_channel",
         R.string.app_name,
         R.string.app_name,
-        NotificationManager.IMPORTANCE_DEFAULT
+        NotificationManager.IMPORTANCE_MAX
     )
 }
 

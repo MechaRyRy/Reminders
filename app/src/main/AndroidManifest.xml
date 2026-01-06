@@ -22,7 +22,7 @@
         android:theme="@style/Theme.Reminders">
 
         <receiver
-            android:name=".notification.NotificationDismissedReceiver"
+            android:name=".notification.NotificationActionReceiver"
             android:exported="false" />
 
         <activity
