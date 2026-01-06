@@ -1,6 +1,6 @@
 package com.meowmakers.reminders.notification
 
-import android.R
+import android.R.drawable.ic_menu_mylocation
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.PendingIntent
 import android.app.Service
@@ -47,7 +47,7 @@ class NotificationService : Service() {
                 this,
                 notification.channel.id
             )
-                .setSmallIcon(R.drawable.ic_menu_mylocation)
+                .setSmallIcon(ic_menu_mylocation)
                 .setContentTitle("Meow Reminder Active")
                 .setContentText("Scanning for nearby locations...")
                 .setSubText("Location Service")
